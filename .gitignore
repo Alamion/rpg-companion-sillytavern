@@ -22,5 +22,5 @@ node_modules/
 # Environment variables
 .env
 
-# Claude 
+# Claude
 CLAUDE.md

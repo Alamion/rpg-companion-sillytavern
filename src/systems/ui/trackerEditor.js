@@ -31,12 +31,25 @@ import { renderUserStats } from '../rendering/userStats.js';
 import { renderInfoBox } from '../rendering/infoBox.js';
 import { renderThoughts } from '../rendering/thoughts.js';
 import { updateFabWidgets } from './mobile.js';
+import { safeToSnake } from '../../utils/transformations.js';
 
 let $editorModal = null;
 let activeTab = 'userStats';
 let tempConfig = null; // Temporary config for cancel functionality
 let tempAssociation = null; // Temporary association state: { presetId: string|null, entityKey: string|null }
 let originalAssociation = null; // Original association when editor opened
+
+
+function set_ids_names(list_with_stats, index, value) {
+    list_with_stats[index].name = value;
+    const ids = list_with_stats.toSpliced(index, 1).map(stat => stat.id);
+    const snake_value = safeToSnake(value);  // new id format
+    if (snake_value !== value && !ids.includes(snake_value)) { // check if this id already exists
+        list_with_stats[index].id = snake_value;
+    }
+    return list_with_stats;
+}
+
 
 /**
  * Initialize the tracker editor modal
@@ -885,7 +898,9 @@ function setupUserStatsListeners() {
     // Rename stat
     $('.rpg-stat-name').off('blur').on('blur', function () {
         const index = $(this).data('index');
-        extensionSettings.trackerConfig.userStats.customStats[index].name = $(this).val();
+        const value = $(this).val();
+        const list_with_stats = extensionSettings.trackerConfig.userStats.customStats
+        set_ids_names(list_with_stats, index, value);
     });
 
     // Change stat max value
@@ -943,7 +958,9 @@ function setupUserStatsListeners() {
     // Rename attribute
     $('.rpg-attr-name').off('blur').on('blur', function () {
         const index = $(this).data('index');
-        extensionSettings.trackerConfig.userStats.rpgAttributes[index].name = $(this).val();
+        const value = $(this).val();
+        const list_with_stats = extensionSettings.trackerConfig.userStats.rpgAttributes
+        set_ids_names(list_with_stats, index, value);
     });
 
     // Enable/disable RPG Attributes section toggle
@@ -1394,7 +1411,9 @@ function setupPresentCharactersListeners() {
     // Rename field
     $('.rpg-field-label').off('blur').on('blur', function () {
         const index = $(this).data('index');
-        extensionSettings.trackerConfig.presentCharacters.customFields[index].name = $(this).val();
+        const value = $(this).val();
+        const list_with_stats = extensionSettings.trackerConfig.presentCharacters.customFields
+        set_ids_names(list_with_stats, index, value);
     });
 
     // Update description
@@ -1443,7 +1462,9 @@ function setupPresentCharactersListeners() {
     // Rename character stat
     $('.rpg-char-stat-label').off('blur').on('blur', function () {
         const index = $(this).data('index');
-        extensionSettings.trackerConfig.presentCharacters.characterStats.customStats[index].name = $(this).val();
+        const value = $(this).val();
+        const list_with_stats = extensionSettings.trackerConfig.presentCharacters.characterStats.customStats
+        set_ids_names(list_with_stats, index, value);
     });
 }
 
