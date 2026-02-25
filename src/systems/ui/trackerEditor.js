@@ -44,7 +44,8 @@ function set_ids_names(list_with_stats, index, value) {
     list_with_stats[index].name = value;
     const ids = list_with_stats.toSpliced(index, 1).map(stat => stat.id);
     const snake_value = safeToSnake(value);  // new id format
-    if (snake_value !== value && !ids.includes(snake_value)) { // check if this id already exists
+    const currentId = list_with_stats[index].id;
+    if (snake_value !== currentId && !ids.includes(snake_value)) { // check if this id already exists
         list_with_stats[index].id = snake_value;
     }
     return list_with_stats;
