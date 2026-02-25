@@ -42,11 +42,28 @@ let originalAssociation = null; // Original association when editor opened
 
 function set_ids_names(list_with_stats, index, value) {
     list_with_stats[index].name = value;
+    const item = list_with_stats[index];
+    const oldId = item?.id;
+
+    item.name = value;
     const ids = list_with_stats.toSpliced(index, 1).map(stat => stat.id);
     const snake_value = safeToSnake(value);  // new id format
-    const currentId = list_with_stats[index].id;
-    if (snake_value !== currentId && !ids.includes(snake_value)) { // check if this id already exists
-        list_with_stats[index].id = snake_value;
+    if (snake_value !== value && !ids.includes(snake_value)) { // check if this id already exists
+        item.id = snake_value;
+    }
+
+    const newId = item.id;
+    // If the ID changed, migrate any stored values keyed by the old ID
+    if (oldId && newId && oldId !== newId) {
+        if (extensionSettings.userStats && Object.prototype.hasOwnProperty.call(extensionSettings.userStats, oldId)) {
+            extensionSettings.userStats[newId] = extensionSettings.userStats[oldId];
+            delete extensionSettings.userStats[oldId];
+        }
+
+        if (extensionSettings.classicStats && Object.prototype.hasOwnProperty.call(extensionSettings.classicStats, oldId)) {
+            extensionSettings.classicStats[newId] = extensionSettings.classicStats[oldId];
+            delete extensionSettings.classicStats[oldId];
+        }
     }
     return list_with_stats;
 }
